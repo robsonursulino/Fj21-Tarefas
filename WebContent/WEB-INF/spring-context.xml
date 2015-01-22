@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xsi:schemaLocation="
+    	http://www.springframework.org/schema/mvc 
+    	http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd
+   	    http://www.springframework.org/schema/beans 
+    	http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+    	http://www.springframework.org/schema/context 
+    	http://www.springframework.org/schema/context/spring-context-4.0.xsd
+    	http://www.springframework.org/schema/tx 
+    	http://www.springframework.org/schema/tx/spring-tx-4.0.xsd">
+
+	<!-- Configura o pacote base com as classe --> 
+	<context:component-scan base-package="br.com.caelum.tarefas"/>
+
+	<!-- Configura o spring para trabalhar com anotações -->
+    <mvc:annotation-driven/>
+    
+    <!-- Configura o spring para ignorar acesso a conteúdo estático (css, imagens, js, etc) -->
+    <mvc:default-servlet-handler/>
+ 
+ 	<!-- Configura o local onde estão localizados os arquivos jsp -->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+    	<property name="prefix" value="/WEB-INF/views/"/>
+   	    <property name="suffix" value=".jsp"/>
+    </bean>
+    
+    <!-- Interceptors funciona como filtros das servlets -->
+    <mvc:interceptors>
+    	<bean class="br.com.caelum.tarefas.interceptor.AutorizadorInterceptor"></bean>
+    </mvc:interceptors>
+    
+    <!-- Configura o datasource -->
+    <bean id="mysqlDataSource" class="org.apache.commons.dbcp.BasicDataSource">
+    	<property name="driverClassName" value="com.mysql.jdbc.Driver"></property>
+    	<property name="url" value="jdbc:mysql://localhost/tarefas"></property>
+    	<property name="username" value="root"></property>
+    	<property name="password" value="senha"></property>
+    </bean>
+    
+    <!-- Configura o gerenciamento do JPA pelo Spring -->
+    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+    	<property name="DataSource" ref="mysqlDataSource"></property>
+    	<property name="JpaVendorAdapter"> <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"></bean></property>
+    </bean>
+    
+    <!-- Gerenciamento de transação pelo Spring -->
+    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+    	<property name="entityManagerFactory" ref="entityManagerFactory"></property>	
+    </bean>
+    
+    <!-- Configura o Spring para permitir configurar transações por anotações -->
+	<tx:annotation-driven/>    
+    
+</beans>
